@@ -1,8 +1,9 @@
+const Trello = require('trello');
 const jp = require('jsonpath');
 
 class BoardExtractor {
-  constructor(trello, orgId) {
-    this.trello = trello;
+  constructor(key, token, orgId) {
+    this.trello = new Trello(key, token);
     this.orgId = orgId;
   }
 
@@ -14,9 +15,17 @@ class BoardExtractor {
     return results.length > 0 ? results[0].id : undefined;
   }
 
-  async getBoardById(id, attributes = {}) {
+  async getBoardListsWithCardsById(id) {
     const lists = await this.trello.getListsOnBoard(id);
-    console.log(lists);
+
+    const promises = lists.map(async list => {
+      return {
+        listName: list.name,
+        cards: await this.trello.getCardsOnList(list.id)
+      };
+    });
+    const listsWithCards = await Promise.all(promises);
+    return listsWithCards;
   }
 }
 
