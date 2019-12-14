@@ -10,7 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "jsonpath": "^1.0.2",
-    "trello": "^0.9.1"
+    "trello": "^0.9.1",
+    "underscore": "^1.9.1"
   },
   "devDependencies": {
     "eslint": "^6.7.2",
