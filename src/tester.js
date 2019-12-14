@@ -1,3 +1,4 @@
+const path = require('path');
 const BoardExtractor = require('./boardExtractor');
 const ListToCsvWriter = require('./listToCsvWriter');
 
@@ -6,7 +7,6 @@ require('dotenv').config();
 const key = process.env.TRELLO_KEY;
 const token = process.env.TRELLO_TOKEN;
 
-// Get board ID first using org ID
 const daOrgId = process.env.ORG_ID;
 
 (async () => {
@@ -15,5 +15,5 @@ const daOrgId = process.env.ORG_ID;
   const listsWithCards = await boardExtractor.getBoardListsWithCardsById(boardId);
 
   const csver = new ListToCsvWriter(listsWithCards);
-  console.log(csver.generateCsv());
+  csver.writeToCsv(path.resolve(process.cwd(), 'tmp.csv'));
 })();

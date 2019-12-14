@@ -1,4 +1,5 @@
 const _ = require('underscore');
+const csv = require('fast-csv');
 
 function extractCardInformation(card) {
   return card.name;
@@ -19,8 +20,12 @@ class ListToCsvWriter {
     });
   }
 
-  generateCsv() {
-    return _.zip(...this.generateArrays());
+  writeToCsv(path) {
+    const csvReadyArrays = _.zip(...this.generateArrays());
+    csv
+      .writeToPath(path, csvReadyArrays)
+      .on('error', err => console.error(err))
+      .on('finish', () => console.log('Done writing.'));
   }
 }
 
