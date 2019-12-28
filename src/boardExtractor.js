@@ -15,7 +15,7 @@ class BoardExtractor {
     return results.length > 0 ? results[0].id : undefined;
   }
 
-  async getBoardListsWithCardsById(id) {
+  async getBoardListsWithCardsById(id, opts = { withStickers: true, withComments: true }) {
     const lists = await this.trello.getListsOnBoard(id);
 
     const promises = lists.map(async list => {
@@ -26,6 +26,18 @@ class BoardExtractor {
     });
     const listsWithCards = await Promise.all(promises);
     return listsWithCards;
+  }
+
+  async getCardCommentsByCardId(id) {
+    const actions = await this.trello.makeRequest('get', `/1/cards/${id}/actions`, {
+      filter: 'commentCard',
+      format: 'list',
+      memberCreator: false,
+      member: false,
+      fields: 'data'
+    });
+
+    return actions.map(action => action.data.text);
   }
 }
 
