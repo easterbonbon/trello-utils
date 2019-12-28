@@ -2,7 +2,14 @@ const _ = require('underscore');
 const csv = require('fast-csv');
 
 function extractCardInformation(card) {
-  return card.name;
+  let cardWithComments = `${card.name}`;
+
+  if (card.comments.length > 0) {
+    cardWithComments += '\n---\n';
+    cardWithComments += card.comments.join('\n');
+  }
+
+  return cardWithComments;
 }
 
 class ListToCsvWriter {
