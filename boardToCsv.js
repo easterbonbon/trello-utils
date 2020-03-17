@@ -11,12 +11,18 @@ const token = process.env.TRELLO_TOKEN;
 const daOrgId = process.env.ORG_ID;
 
 async function writeBoardToCsv(boardName, filename) {
-  const trello = new Trello(key, token);
-  const boardId = await BoardExtractor.getBoardIdByName(trello, daOrgId, boardName);
-  const listsWithCards = await BoardExtractor.getBoardListsWithCardsById(trello, boardId);
+  console.log('== Writing board to CSV ==');
 
-  const outputPath = path.resolve(process.cwd(), `${filename}.csv`);
-  new ListToCsvWriter(listsWithCards).writeToCsv(outputPath);
+  const trello = new Trello(key, token);
+
+  try {
+    const boardId = await BoardExtractor.getBoardIdByName(trello, daOrgId, boardName);
+    const listsWithCards = await BoardExtractor.getBoardListsWithCardsById(trello, boardId);
+    const outputPath = path.resolve(process.cwd(), 'output', `${filename}.csv`);
+    new ListToCsvWriter(listsWithCards).writeToCsv(outputPath);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 module.exports = { writeBoardToCsv };

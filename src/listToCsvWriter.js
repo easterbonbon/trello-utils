@@ -1,20 +1,33 @@
 const _ = require('underscore');
 const csv = require('fast-csv');
 
-function extractCardInformation(card) {
-  let cardWithComments = `${card.name}`;
+function extractCardInformation(card, extractCreator = false) {
+  let cardWithComments = `${card.name}\n`;
 
-  if (card.comments.length > 0) {
-    cardWithComments += '\n---\n';
-    cardWithComments += card.comments.join('\n');
+  if (card.desc !== '') {
+    cardWithComments += '\n== Description ==\n';
+    cardWithComments += `${card.desc}\n`;
+  }
+
+  const hasComments = card.comments.length > 0;
+  if (hasComments) {
+    cardWithComments += '\n== Comments ==\n';
+
+    card.comments.forEach(comment => {
+      const creator = comment.memberCreator.fullName;
+      const { text } = comment;
+      const formattedComment = extractCreator ? `${creator}: ${text}` : text;
+      cardWithComments += `${formattedComment}\n`;
+    });
   }
 
   return cardWithComments;
 }
 
 class ListToCsvWriter {
-  constructor(listsWithCards) {
+  constructor(listsWithCards, options = { appendCommentCreator: false }) {
     this.listsWithCards = listsWithCards;
+    this.options = options;
   }
 
   /**
@@ -23,7 +36,9 @@ class ListToCsvWriter {
    */
   generateArrays() {
     return this.listsWithCards.map(({ listName, cards }) => {
-      return [listName].concat(cards.map(extractCardInformation));
+      return [listName].concat(
+        cards.map(extractCardInformation, this.options.appendCommentCreator)
+      );
     });
   }
 

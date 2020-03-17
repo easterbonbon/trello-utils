@@ -1,4 +1,5 @@
 const path = require('path');
+const Trello = require('trello');
 const BoardExtractor = require('./boardExtractor');
 const ListToCsvWriter = require('./listToCsvWriter');
 
@@ -9,11 +10,22 @@ const token = process.env.TRELLO_TOKEN;
 
 const daOrgId = process.env.ORG_ID;
 
-(async () => {
-  const boardExtractor = new BoardExtractor(key, token, daOrgId);
-  const boardId = await boardExtractor.getBoardIdByName('Dash #86');
-  const listsWithCards = await boardExtractor.getBoardListsWithCardsById(boardId);
+const trello = new Trello(key, token);
 
-  const csver = new ListToCsvWriter(listsWithCards);
-  csver.writeToCsv(path.resolve(process.cwd(), 'tmp.csv'));
+(async () => {
+  const boardId = await BoardExtractor.getBoardIdByName(
+    trello,
+    daOrgId,
+    'Phoenix Project - Ch 1, 2'
+  );
+  const listsWithCards = await BoardExtractor.getBoardListsWithCardsById(trello, boardId, true);
+
+  const csver = new ListToCsvWriter(listsWithCards, { appendCommentCreator: true });
+  csver.writeToCsv(path.resolve(process.cwd(), 'output', 'tmp.csv'));
+
+  // Comment tester
+  // const lists = await trello.getListsOnBoard(boardId);
+  // const cards = await trello.getCardsOnList(lists[0].id);
+  // const comments = await BoardExtractor.getCardCommentsByCardId(trello, cards[0].id);
+  // console.log(comments);
 })();
