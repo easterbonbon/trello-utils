@@ -2,11 +2,11 @@ const _ = require('underscore');
 const csv = require('fast-csv');
 
 function extractCardInformation(card, extractCreator = false) {
-  let cardWithComments = `${card.name}\n`;
+  let cardWithComments = `${card.name}`;
 
   if (card.desc !== '') {
     cardWithComments += '\n== Description ==\n';
-    cardWithComments += `${card.desc}\n`;
+    cardWithComments += `${card.desc}`;
   }
 
   const hasComments = card.comments.length > 0;
@@ -37,7 +37,9 @@ class ListToCsvWriter {
   generateArrays() {
     return this.listsWithCards.map(({ listName, cards }) => {
       return [listName].concat(
-        cards.map(extractCardInformation, this.options.appendCommentCreator)
+        cards.map(card => {
+          return extractCardInformation(card, this.options.appendCommentCreator);
+        })
       );
     });
   }
